@@ -80,11 +80,9 @@
 
   --page-bg: linear-gradient(135deg, #1e293b, #0f172a);
 
-  /* 暗色模式下的默认品牌色 */
   --brand-color: #6b8aff;
   --brand-rgb: 107, 138, 255;
 
-  /* 暗色下 tint 稍微加重，才看得出来 */
   --brand-tint-soft: rgba(var(--brand-rgb), 0.08);
   --brand-tint: rgba(var(--brand-rgb), 0.12);
   --brand-tint-strong: rgba(var(--brand-rgb), 0.2);
@@ -152,7 +150,6 @@ body {
   height: var(--search-height, 48px);
   padding: 0 6px 0 5px;
   background-color: var(--glass-bg);
-  /* 叠加一层品牌色，形成淡淡的整体色调 */
   background-image: linear-gradient(var(--brand-tint), var(--brand-tint));
   backdrop-filter: var(--blur);
   -webkit-backdrop-filter: var(--blur);
@@ -406,7 +403,9 @@ body {
 .panel-add:active,
 .panel-close:active { transform: scale(0.94); }
 
+/* 按钮组：作为排序菜单的定位参照（关键修复） */
 .panel-header-actions {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -434,8 +433,9 @@ body {
 .panel-icon-btn:active { transform: scale(0.94); }
 
 /* ==================== 排序菜单 ==================== */
+/* 排序按钮的包裹元素不再承担定位职责，交给 .panel-header-actions */
 .panel-sort-wrap {
-  position: relative;
+  display: inline-flex;
 }
 
 .sort-menu {
@@ -490,7 +490,7 @@ body {
   opacity: 0.85;
 }
 
-/* ==================== 收藏夹表单（也染上品牌色） ==================== */
+/* ==================== 收藏夹表单 ==================== */
 .bookmark-form {
   display: none;
   flex-direction: column;
