@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mistveil</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="newtab.js" defer></script>
+</head>
+<body>
+  <!-- 壁纸层 -->
+  <div class="bg" id="bgLayer"></div>
+
+  <!-- 三边提示条 -->
+  <div class="edge-hint edge-hint-left" id="edgeHintLeft"></div>
+  <div class="edge-hint edge-hint-right" id="edgeHintRight"></div>
+  <div class="edge-hint edge-hint-bottom" id="edgeHintBottom"></div>
+
+  <!-- 收藏夹面板（左） -->
+  <aside class="side-panel bookmark-panel" id="bookmarkPanel" aria-label="收藏夹">
+    <div class="panel-header">
+      <span class="panel-title">收藏夹</span>
+      <div class="panel-header-actions">
+        <div class="panel-sort-wrap" id="sortWrap">
+          <button type="button" class="panel-icon-btn" id="sortBookmarkBtn" title="排序方式" aria-label="排序方式" aria-expanded="false">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h11"></path>
+              <path d="M3 12h8"></path>
+              <path d="M3 18h5"></path>
+              <path d="M18 4v16"></path>
+              <path d="m15 17 3 3 3-3"></path>
+            </svg>
+          </button>
+          <ul class="sort-menu" id="sortMenu" role="menu" aria-label="排序方式">
+            <li role="menuitem" data-sort="time-desc">时间（新 → 旧）</li>
+            <li role="menuitem" data-sort="time-asc">时间（旧 → 新）</li>
+            <li role="menuitem" data-sort="alpha-asc">字母（A → Z）</li>
+            <li role="menuitem" data-sort="alpha-desc">字母（Z → A）</li>
+          </ul>
+        </div>
+        <button type="button" class="panel-icon-btn" id="addFolderBtn" title="新建文件夹" aria-label="新建文件夹">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"></path>
+            <path d="M12 11v6M9 14h6"></path>
+          </svg>
+        </button>
+        <button type="button" class="panel-icon-btn" id="importBookmarkBtn" title="导入收藏" aria-label="导入收藏">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12"></path>
+            <path d="m7 10 5 5 5-5"></path>
+            <path d="M5 21h14"></path>
+          </svg>
+        </button>
+        <button type="button" class="panel-icon-btn" id="exportBookmarkBtn" title="导出收藏" aria-label="导出收藏">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21V9"></path>
+            <path d="m7 14 5-5 5 5"></path>
+            <path d="M5 3h14"></path>
+          </svg>
+        </button>
+        <button type="button" class="panel-add" id="addBookmarkBtn" title="添加收藏">+</button>
+      </div>
+    </div>
+
+    <form class="bookmark-form" id="bookmarkForm">
+      <input class="bm-input" id="bmTitle" type="text" placeholder="名称（可留空）" autocomplete="off" />
+      <input class="bm-input" id="bmUrl" type="text" placeholder="网址，例如 example.com" autocomplete="off" />
+      <select class="bm-select" id="bmFolder" aria-label="选择文件夹">
+        <option value="">未分类</option>
+      </select>
+      <div class="bm-actions">
+        <button type="submit" class="bm-save">保存</button>
+        <button type="button" class="bm-cancel" id="cancelBookmark">取消</button>
+      </div>
+    </form>
+
+    <div class="bookmark-scroll">
+      <div class="folder-area" id="folderArea"></div>
+      <ul class="bookmark-list" id="bookmarkList"></ul>
+    </div>
+  </aside>
+
+  <!-- 设置面板（右） -->
+  <aside class="side-panel settings-panel" id="settingsPanel" aria-label="设置">
+    <div class="panel-header">
+      <span class="panel-title">设置</span>
+      <button type="button" class="panel-close" id="settingsClose" title="关闭" aria-label="关闭">×</button>
+    </div>
+
+    <div class="settings-body">
+      <section class="settings-section">
+        <div class="settings-section-title">主题</div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">外观模式</div>
+            <div class="settings-row-desc">亮色、暗色或跟随系统</div>
+          </div>
+          <div class="theme-switch" id="themeSwitch">
+            <button type="button" class="theme-opt" data-theme="system">跟随系统</button>
+            <button type="button" class="theme-opt active" data-theme="light">亮色</button>
+            <button type="button" class="theme-opt" data-theme="dark">暗色</button>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">全局颜色</div>
+            <div class="settings-row-desc">品牌色与强调色</div>
+          </div>
+          <div class="color-picker-wrap">
+            <input type="color" class="color-picker" id="brandColorInput" value="#4d6bfe" aria-label="选择全局颜色" />
+            <span class="color-value" id="brandColorValue">#4D6BFE</span>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">圆角大小</div>
+            <div class="settings-row-desc">全局圆角半径，默认 8px 对应 Windows 11</div>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" class="slider" id="radiusRange" min="0" max="24" step="1" value="8" />
+            <span class="slider-value" id="radiusValue">8px</span>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">重置外观</div>
+            <div class="settings-row-desc">恢复主题、颜色、圆角、搜索框尺寸与位置、遮罩为默认</div>
+          </div>
+          <div class="settings-row-actions">
+            <button type="button" class="btn btn-danger" id="resetAppearanceBtn">重置</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <div class="settings-section-title">搜索框</div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">宽度</div>
+            <div class="settings-row-desc">调整搜索框的横向长度</div>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" class="slider" id="searchWidthRange" min="320" max="900" step="10" value="600" />
+            <span class="slider-value" id="searchWidthValue">600px</span>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">高度</div>
+            <div class="settings-row-desc">调整搜索框的高度</div>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" class="slider" id="searchHeightRange" min="36" max="72" step="1" value="48" />
+            <span class="slider-value" id="searchHeightValue">48px</span>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">垂直位置</div>
+            <div class="settings-row-desc">沿垂直方向移动搜索框</div>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" class="slider" id="searchPosRange" min="-30" max="30" step="1" value="0" />
+            <span class="slider-value" id="searchPosValue">居中</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <div class="settings-section-title">字体</div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">自定义字体</div>
+            <div class="settings-row-desc">支持 .ttf / .otf / .woff / .woff2，全局生效</div>
+          </div>
+          <div class="settings-row-actions">
+            <button type="button" class="btn" id="fontUploadBtn">上传</button>
+            <button type="button" class="btn btn-ghost" id="fontResetBtn">重置</button>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">当前字体</div>
+          </div>
+          <div class="settings-row-value" id="fontCurrent" title="系统默认">系统默认</div>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <div class="settings-section-title">壁纸</div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">背景图片</div>
+            <div class="settings-row-desc">上传后会加入底部壁纸面板</div>
+          </div>
+          <div class="settings-row-actions">
+            <button type="button" class="btn" id="uploadBtn">上传</button>
+            <button type="button" class="btn btn-ghost" id="resetBtn">重置</button>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">暗色遮罩</div>
+            <div class="settings-row-desc">在壁纸上叠加一层暗色，便于阅读</div>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" class="slider" id="overlayRange" min="0" max="80" step="1" value="30" />
+            <span class="slider-value" id="overlayValue">30%</span>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-text">
+            <div class="settings-row-label">底部边缘触发</div>
+            <div class="settings-row-desc">鼠标贴近屏幕底部呼出壁纸面板（区域已缩小到 4px）</div>
+          </div>
+          <div class="theme-switch" id="wallpaperEdgeSwitch">
+            <button type="button" class="theme-opt active" data-enabled="true">开启</button>
+            <button type="button" class="theme-opt" data-enabled="false">关闭</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Mistveil 品牌标识 -->
+    <div class="settings-brand" aria-hidden="true">
+      <svg class="brand-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="38" height="38" rx="13"
+              fill="none" stroke="currentColor" stroke-width="2.4" opacity="0.35"/>
+        <path d="M12 18 Q16 14, 20 18 T 28 18 T 36 18"
+              fill="none" stroke="currentColor" stroke-width="2.8"
+              stroke-linecap="round" opacity="1"/>
+        <path d="M12 24 Q16 20, 20 24 T 28 24 T 36 24"
+              fill="none" stroke="currentColor" stroke-width="2.8"
+              stroke-linecap="round" opacity="0.6"/>
+        <path d="M12 30 Q16 26, 20 30 T 28 30 T 36 30"
+              fill="none" stroke="currentColor" stroke-width="2.8"
+              stroke-linecap="round" opacity="0.3"/>
+      </svg>
+      <span class="brand-name">Mistveil</span>
+    </div>
+
+    <!-- 面板底部署名 -->
+    <div class="settings-footer">
+      <svg class="footer-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path fill="currentColor" d="M7.4 2.8C4.1 2.8 1.5 5.3 1.5 8.4c0 3.1 2.6 5.6 5.9 5.6 2.7 0 5-1.8 5.6-4.3l1.9 1.3c.4.3.9.1.9-.4V6.2c0-.5-.5-.7-.9-.4l-1.9 1.3c-.6-2.5-2.9-4.3-5.6-4.3z"/>
+        <path fill="var(--glass-bg)" d="M5.8 7.2C4.5 7.8 3.6 9.1 3.6 10.6c0 .5.1 1 .3 1.4 1.3-.3 2.3-1.4 2.6-2.8.1-.6.1-1.2-.1-1.7-.2-.1-.4-.2-.6-.3z"/>
+        <circle cx="6.4" cy="6.3" r="0.85" fill="var(--glass-bg)"/>
+      </svg>
+      <span>Made by DeepSeek</span>
+    </div>
+  </aside>
+
+  <!-- 壁纸面板（下） -->
+  <aside class="side-panel wallpaper-panel" id="wallpaperPanel" aria-label="壁纸">
+    <div class="panel-header">
+      <span class="panel-title">壁纸</span>
+      <button type="button" class="panel-close" id="wallpaperClose" title="关闭" aria-label="关闭">×</button>
+    </div>
+
+    <div class="wallpaper-body">
+      <div class="wallpaper-section-title">预设</div>
+      <div class="wallpaper-grid" id="presetGrid"></div>
+
+      <div class="wallpaper-section-title">我的上传</div>
+      <div class="wallpaper-grid" id="uploadGrid"></div>
+    </div>
+  </aside>
+
+  <!-- 居中的搜索框 -->
+  <main class="center">
+    <form class="search-box" id="searchForm" autocomplete="off" role="search">
+      <div class="engine">
+        <button type="button" class="engine-btn" id="engineBtn"
+                aria-haspopup="listbox" aria-expanded="false" title="切换搜索引擎">
+          <span class="engine-name" id="engineName">Bing</span>
+          <svg class="caret" viewBox="0 0 24 24" width="12" height="12" fill="none"
+               stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+        <ul class="engine-list" id="engineList" role="listbox" aria-label="选择搜索引擎"></ul>
+      </div>
+
+      <input class="search-input" id="q" type="text" name="q"
+             placeholder="搜索…" spellcheck="false" />
+
+      <button class="search-submit" type="submit" title="搜索" aria-label="搜索">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M20.5 20.5 16.7 16.7" />
+        </svg>
+      </button>
+    </form>
+  </main>
+
+  <input type="file" id="fileInput" accept="image/*" hidden />
+  <input type="file" id="fontInput" accept=".ttf,.otf,.woff,.woff2,font/*" hidden />
+  <input type="file" id="bookmarkImportInput" accept=".html,.htm,.json,text/html,application/json" hidden />
+</body>
+</html>

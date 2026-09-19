@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Mistveil",
+  "version": "1.0.0",
+  "description": "一块通透的起始页：居中搜索、三面浮出面板、可换壁纸与字体。",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "permissions": ["storage", "unlimitedStorage"],
+  "action": {
+    "default_title": "Mistveil"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
